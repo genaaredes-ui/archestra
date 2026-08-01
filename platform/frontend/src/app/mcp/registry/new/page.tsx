@@ -1,7 +1,7 @@
 "use client";
 
 import { MCP_CATALOG_CLONE_QUERY_PARAM } from "@archestra/shared";
-import { ArrowLeft, Copy, PencilRuler, Search } from "lucide-react";
+import { ArrowLeft, Copy, FileJson, PencilRuler, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -25,6 +25,7 @@ import { useOrganization } from "@/lib/organization.query";
 import { ArchestraCatalogTab } from "../_parts/archestra-catalog-tab";
 import { SetupStepper } from "../_parts/catalog-setup-wizard";
 import { McpCatalogForm } from "../_parts/mcp-catalog-form";
+import { McpConfigImportDialog } from "../_parts/mcp-config-import-dialog";
 import type { McpCatalogFormValues } from "../_parts/mcp-catalog-form.types";
 import {
   buildCloneFormValues,
@@ -66,6 +67,7 @@ export default function NewMcpCatalogItemPage() {
     cloneSourceId ? "configure" : "source",
   );
   const [browsingCatalog, setBrowsingCatalog] = useState(false);
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
   const [prefilledValues, setPrefilledValues] = useState<
     McpCatalogFormValues | undefined
   >(undefined);
@@ -114,6 +116,12 @@ export default function NewMcpCatalogItemPage() {
     setStep("configure");
   };
 
+  const handleImportConfig = (formValues: McpCatalogFormValues) => {
+    setPrefilledValues(formValues);
+    setBrowsingCatalog(false);
+    setStep("configure");
+  };
+
   // Resolve the catalog setting before rendering so a disabled org never
   // flashes the source chooser before falling back to the form.
   if (isOrganizationPending) {
@@ -147,7 +155,7 @@ export default function NewMcpCatalogItemPage() {
       <SetupStepper activeStep="configuration" />
 
       {catalogEnabled && step === "source" && !browsingCatalog && (
-        <div className="grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-3">
           <button
             type="button"
             className="text-left"
@@ -187,6 +195,28 @@ export default function NewMcpCatalogItemPage() {
               </CardHeader>
             </Card>
           </button>
+          <button
+            type="button"
+            className="text-left"
+            onClick={() => {
+              setPrefilledValues(undefined);
+              setStep("configure");
+              setIsImportDialogOpen(true);
+            }}
+          >
+            <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/40">
+              <CardHeader>
+                <div className="mb-1 flex h-10 w-10 items-center justify-center rounded-lg bg-muted">
+                  <FileJson className="h-5 w-5" />
+                </div>
+                <CardTitle>Paste JSON Configuration</CardTitle>
+                <CardDescription>
+                  Import a client configuration with command, args, env, URL,
+                  or headers.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </button>
         </div>
       )}
 
@@ -214,6 +244,19 @@ export default function NewMcpCatalogItemPage() {
             mode="create"
             onSubmit={onSubmit}
             formValues={prefilledValues ?? cloneValues}
+            catalogButton={
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsImportDialogOpen(true)}
+                >
+                  <FileJson className="h-4 w-4" />
+                  Import JSON configuration
+                </Button>
+              </div>
+            }
             notice={
               cloneSource ? (
                 <Alert>
@@ -253,6 +296,12 @@ export default function NewMcpCatalogItemPage() {
           />
         </div>
       )}
+
+      <McpConfigImportDialog
+        open={isImportDialogOpen}
+        onOpenChange={setIsImportDialogOpen}
+        onImport={handleImportConfig}
+      />
     </div>
   );
 }
