@@ -25,12 +25,12 @@ import { useOrganization } from "@/lib/organization.query";
 import { ArchestraCatalogTab } from "../_parts/archestra-catalog-tab";
 import { SetupStepper } from "../_parts/catalog-setup-wizard";
 import { McpCatalogForm } from "../_parts/mcp-catalog-form";
-import { McpConfigImportDialog } from "../_parts/mcp-config-import-dialog";
 import type { McpCatalogFormValues } from "../_parts/mcp-catalog-form.types";
 import {
   buildCloneFormValues,
   transformFormToApiData,
 } from "../_parts/mcp-catalog-form.utils";
+import { McpConfigImportDialog } from "../_parts/mcp-config-import-dialog";
 
 type SourceSubStep = "source" | "configure";
 
@@ -211,8 +211,8 @@ export default function NewMcpCatalogItemPage() {
                 </div>
                 <CardTitle>Paste JSON Configuration</CardTitle>
                 <CardDescription>
-                  Import a client configuration with command, args, env, URL,
-                  or headers.
+                  Import a client configuration with command, args, env, URL, or
+                  headers.
                 </CardDescription>
               </CardHeader>
             </Card>

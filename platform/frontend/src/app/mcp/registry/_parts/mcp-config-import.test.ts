@@ -9,7 +9,7 @@ describe("parseMcpConfig", () => {
           github: {
             command: "npx",
             args: ["-y", "@modelcontextprotocol/server-github"],
-            env: { GITHUB_TOKEN: "${input:github_token}" },
+            env: { GITHUB_TOKEN: `\${input:github_token}` },
           },
         },
         inputs: [
@@ -46,7 +46,7 @@ describe("parseMcpConfig", () => {
           linear: {
             type: "http",
             url: "https://mcp.example.com",
-            headers: { Authorization: "Bearer ${input:linear_token}" },
+            headers: { Authorization: `Bearer \${input:linear_token}` },
           },
         },
         inputs: {
@@ -148,11 +148,15 @@ describe("parseMcpConfig", () => {
       }),
     );
 
-    expect(result).toMatchObject({ candidates: [{ label: "io.example/github" }] });
+    expect(result).toMatchObject({
+      candidates: [{ label: "io.example/github" }],
+    });
     if (!("candidates" in result)) return;
     const values = result.candidates[0]?.values;
     expect(values?.localConfig?.command).toBe("npx");
-    expect(values?.localConfig?.arguments).toBe("-y\n@example/github-mcp@1.2.3");
+    expect(values?.localConfig?.arguments).toBe(
+      "-y\n@example/github-mcp@1.2.3",
+    );
     expect(values?.localConfig?.environment).toEqual([
       expect.objectContaining({
         key: "API_TOKEN",

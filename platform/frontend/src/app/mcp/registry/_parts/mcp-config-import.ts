@@ -60,8 +60,7 @@ function inputDefinitions(value: unknown): Map<string, InputDefinition> {
       const id = stringValue(input.id);
       if (!id) continue;
       definitions.set(id, {
-        description:
-          stringValue(input.description) || stringValue(input.title),
+        description: stringValue(input.description) || stringValue(input.title),
         sensitive: input.password === true || input.sensitive === true,
       });
     }
@@ -69,8 +68,7 @@ function inputDefinitions(value: unknown): Map<string, InputDefinition> {
     for (const [id, input] of Object.entries(value)) {
       if (!isRecord(input)) continue;
       definitions.set(id, {
-        description:
-          stringValue(input.description) || stringValue(input.title),
+        description: stringValue(input.description) || stringValue(input.title),
         sensitive: input.password === true || input.sensitive === true,
       });
     }
@@ -129,12 +127,11 @@ function toEnvironment(
       metadata?.sensitive === true ||
       SENSITIVE_NAME_PATTERN.test(key);
     const format = stringValue(metadata?.format)?.toLowerCase();
-    const type =
-      sensitive
-        ? "secret"
-        : format === "number" || format === "boolean"
-          ? format
-          : environmentType(rawValue, key);
+    const type = sensitive
+      ? "secret"
+      : format === "number" || format === "boolean"
+        ? format
+        : environmentType(rawValue, key);
 
     return {
       key,
@@ -216,8 +213,16 @@ function officialConnectionConfig(config: JsonRecord): JsonRecord {
 
       if (!command && identifier && registryType.toLowerCase() === "npm") {
         command = "npx";
-        args = ["-y", version ? `${identifier}@${version}` : identifier, ...args];
-      } else if (!command && identifier && registryType.toLowerCase() === "pypi") {
+        args = [
+          "-y",
+          version ? `${identifier}@${version}` : identifier,
+          ...args,
+        ];
+      } else if (
+        !command &&
+        identifier &&
+        registryType.toLowerCase() === "pypi"
+      ) {
         command = "uvx";
         args = [version ? `${identifier}==${version}` : identifier, ...args];
       }
@@ -258,7 +263,9 @@ function toHeaders(
     const input = inputId ? inputs.get(inputId) : undefined;
     const shouldPrompt = Boolean(inputId);
     const bearer = valueText?.match(/^Bearer\s+/i) !== null;
-    const cleanValue = bearer ? valueText?.replace(/^Bearer\s+/i, "") : valueText;
+    const cleanValue = bearer
+      ? valueText?.replace(/^Bearer\s+/i, "")
+      : valueText;
 
     return {
       fieldName: fieldName(headerName, index),
@@ -274,7 +281,9 @@ function toHeaders(
   });
 }
 
-function defaultOAuthConfig(): NonNullable<McpCatalogFormValues["oauthConfig"]> {
+function defaultOAuthConfig(): NonNullable<
+  McpCatalogFormValues["oauthConfig"]
+> {
   const redirectOrigin =
     typeof window === "undefined" ? "" : window.location.origin;
   return {
@@ -320,11 +329,16 @@ function baseValues(
 
 function argumentList(value: unknown): string[] {
   if (Array.isArray(value)) {
-    return value.map((item) => jsonValue(item)).filter((item): item is string => Boolean(item));
+    return value
+      .map((item) => jsonValue(item))
+      .filter((item): item is string => Boolean(item));
   }
   const text = stringValue(value);
   if (!text) return [];
-  return text.split("\n").map((item) => item.trim()).filter(Boolean);
+  return text
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function candidateFromConfig(
@@ -340,15 +354,20 @@ function candidateFromConfig(
   const command = stringValue(config.command);
   const dockerImage =
     stringValue(config.dockerImage) || stringValue(config.docker_image);
-  const transport = stringValue(config.transportType) || stringValue(config.transport);
+  const transport =
+    stringValue(config.transportType) || stringValue(config.transport);
   const configType = stringValue(config.type)?.toLowerCase();
-  const isRemote = Boolean(url) || ["http", "sse", "streamable-http", "remote"].includes(configType || "");
+  const isRemote =
+    Boolean(url) ||
+    ["http", "sse", "streamable-http", "remote"].includes(configType || "");
 
   if (isRemote && !url) {
     throw new Error(`Configuration "${requestedName}" has no valid URL.`);
   }
   if (!isRemote && !command && !dockerImage) {
-    throw new Error(`Configuration "${requestedName}" has no command, args, or dockerImage.`);
+    throw new Error(
+      `Configuration "${requestedName}" has no command, args, or dockerImage.`,
+    );
   }
 
   const values = baseValues(
@@ -430,7 +449,8 @@ export function parseMcpConfig(text: string): McpConfigImportResult {
     };
   } catch (error) {
     return {
-      error: error instanceof Error ? error.message : "Unsupported configuration.",
+      error:
+        error instanceof Error ? error.message : "Unsupported configuration.",
     };
   }
 }

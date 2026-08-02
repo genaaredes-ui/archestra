@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, FileJson } from "lucide-react";
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,8 +23,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import type { McpCatalogFormValues } from "./mcp-catalog-form.types";
 import {
-  parseMcpConfig,
   type McpConfigImportCandidate,
+  parseMcpConfig,
 } from "./mcp-config-import";
 
 interface McpConfigImportDialogProps {
@@ -38,7 +38,7 @@ const EXAMPLE_CONFIG = `{
     "my-server": {
       "command": "npx",
       "args": ["-y", "my-mcp-server"],
-      "env": { "API_KEY": "${"${input:api_key}"}" }
+      "env": { "API_KEY": "\${input:api_key}" }
     }
   },
   "inputs": [
@@ -109,7 +109,10 @@ export function McpConfigImportDialog({
             <div className="space-y-2">
               {candidates.length > 1 && (
                 <>
-                  <label className="text-sm font-medium" htmlFor="mcp-import-server">
+                  <label
+                    className="text-sm font-medium"
+                    htmlFor="mcp-import-server"
+                  >
                     Server to import
                   </label>
                   <Select value={selectedId} onValueChange={setSelectedId}>
